@@ -1,0 +1,28 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+
+/* global styles */
+* {
+  box-sizing: border-box;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  &:focus {
+    background-color: transparent;
+  }
+}
+
+app-root {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+app-board {
+  position: relative;
+  display: flex;
+  flex: 1;
+}

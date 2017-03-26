@@ -1,0 +1,32 @@
+<div
+  class="app-sticker lighten-3 z-depth-4"
+  (onPositionChanged)="updateStickerPos($event)"
+  [draggable]>
+  <div class="app-sticker-heading" (dblclick)="editTitle()">
+    <div class="app-sticker-heading-static" [hidden]="isEditingTitle">
+      {{ data.title }}
+    </div>
+    <div class="app-sticker-heading-edit" [hidden]="!isEditingTitle">
+      <input
+        #titleInput
+        [(ngModel)]="data.title"
+        (blur)="updateTitle()"
+        type="text">
+    </div>
+  </div>
+  <div class="app-sticker-body" (dblclick)="editDescription()">
+    <div class="app-sticker-body-static" [hidden]="isEditingDescription">
+      {{ data.description }}
+    </div>
+    <div class="app-sticker-body-edit" [hidden]="!isEditingDescription">
+      <textarea
+        #descriptionInput
+        [(ngModel)]="data.description"
+        (blur)="updateDescription()">
+      </textarea>
+    </div>
+  </div>
+  <button class="delete-sticker" (click)="removeSticker()">
+    <i class="material-icons">close</i>
+  </button>
+</div>
