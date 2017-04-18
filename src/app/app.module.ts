@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { BoardComponent } from './board/board.component';
 import {
   HeaderComponent,
+  FooterComponent,
   SharedModule,
   DBService
 } from './shared';
@@ -15,6 +16,7 @@ import {
   declarations: [
     AppComponent,
     HeaderComponent,
+    FooterComponent,
     BoardComponent
   ],
   imports: [
