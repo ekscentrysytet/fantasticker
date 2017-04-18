@@ -1,20 +1,23 @@
-import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Subject, Subscription } from "rxjs";
 
 import { DBService } from '../services';
 import { Sticker } from '../models';
+import { AppConstants } from '../constants';
 
 @Component({
   selector: 'app-sticker',
   templateUrl: './sticker.component.html',
   styleUrls: ['sticker.component.scss']
 })
-export class StickerComponent implements OnInit {
+export class StickerComponent implements OnInit, OnDestroy {
   @Input() data: Sticker;
   @ViewChild('titleInput') titleInput: ElementRef;
   @ViewChild('descriptionInput') descriptionInput: ElementRef;
   isEditingTitle: boolean;
   isEditingDescription: boolean;
-  stickerColors = ['amber', 'blue', 'green', 'orange'];
+  update$: Subject<any> = new Subject();
+  sub: Subscription;
 
   constructor(
     private el: ElementRef,
@@ -22,17 +25,28 @@ export class StickerComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const stickerClass = this.data.stickerClass ? this.data.stickerClass : this.randomColorPick();
     if (!this.data.stickerClass) {
-      this.data.stickerClass = stickerClass;
+      this.el.nativeElement.children[0].classList.add('scale-out');
+      setTimeout(() => {
+        this.el.nativeElement.children[0].classList.add('scale-in')
+      }, 100);
+      this.data.stickerClass = this.randomColorPick();
     }
 
-    this.el.nativeElement.children[0].classList.add(stickerClass);
+    this.el.nativeElement.children[0].classList.add(this.data.stickerClass);
 
-    if (this.data && (this.data.position.left || this.data.position.top)) {
+    if (this.data.position.left || this.data.position.top) {
       this.el.nativeElement.children[0].style.left = this.data.position.left + 'px';
       this.el.nativeElement.children[0].style.top = this.data.position.top + 'px';
     }
+
+    this.sub = this.update$
+      .debounceTime(50)
+      .subscribe(this.updateStickerInDB);
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
   editTitle() {
@@ -57,20 +71,26 @@ export class StickerComponent implements OnInit {
 
   updateStickerPos(pos) {
     this.data.position = pos;
-
     this.updateSticker();
   }
 
   removeSticker() {
-    this.el.nativeElement.remove();
-    this.dbService.deleteItem(this.data);
+    this.el.nativeElement.children[0].classList.add('scale-out');
+    setTimeout(() => {
+      this.el.nativeElement.remove();
+      this.dbService.deleteItem(this.data);
+    }, 200);
   }
 
   private updateSticker() {
-    this.dbService.updateItem(this.data);
+    this.update$.next();
   }
 
+  private updateStickerInDB = () => {
+    this.dbService.updateItem(this.data);
+  };
+
   private randomColorPick(): String {
-    return this.stickerColors[Math.floor(Math.random() * this.stickerColors.length)];
+    return AppConstants.stickerColors[Math.floor(Math.random() * AppConstants.stickerColors.length)];
   }
 }
