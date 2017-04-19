@@ -1,4 +1,4 @@
-import { Directive, ElementRef, EventEmitter, Output, OnInit } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Output, OnInit, Input } from '@angular/core';
 
 @Directive({
   selector: '[draggable]',
@@ -9,6 +9,7 @@ import { Directive, ElementRef, EventEmitter, Output, OnInit } from '@angular/co
 export class DraggableDirective implements OnInit {
   private deltaX: number = 0;
   private deltaY: number = 0;
+  private canDrag: boolean = true;
   private initialPos: {
     left: number,
     top: number
@@ -18,6 +19,10 @@ export class DraggableDirective implements OnInit {
     top: number
   };
 
+  @Input('draggable')
+  set draggable(val: boolean) {
+    this.canDrag = !!val;
+  }
   @Output() onPositionChanged = new EventEmitter<Object>();
 
   constructor(
@@ -32,15 +37,17 @@ export class DraggableDirective implements OnInit {
   }
 
   onMouseDown(event: MouseEvent) {
-    event.preventDefault();
-    this.el.nativeElement.classList.add('dragged');
     this.deltaX = event.x - this.el.nativeElement.offsetLeft;
     this.deltaY = event.y - this.el.nativeElement.offsetTop;
 
-    document.onmousemove = (event: MouseEvent) => this.moveTo(event.x, event.y);
+    document.onmousemove = (event: MouseEvent) => {
+      if (this.canDrag) {
+        event.preventDefault();
+        this.moveTo(event.x, event.y);
+      }
+    };
 
     this.el.nativeElement.onmouseup = () => {
-      this.el.nativeElement.classList.remove('dragged');
       document.onmousemove = null;
       this.el.nativeElement.onmouseup = null;
 
@@ -57,8 +64,6 @@ export class DraggableDirective implements OnInit {
   }
 
   private moveTo(x: number, y: number) {
-    if (!x || !y) return;
-
     const position = window.getComputedStyle(this.el.nativeElement).position;
     const parentWidth = position === 'absolute' ? this.el.nativeElement.parentElement.clientWidth : window.innerWidth;
     const parentHeight = position === 'absolute' ? this.el.nativeElement.parentElement.clientHeight : window.innerHeight;

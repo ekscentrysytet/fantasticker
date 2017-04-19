@@ -16,6 +16,7 @@ export class StickerComponent implements OnInit, OnDestroy {
   @ViewChild('descriptionInput') descriptionInput: ElementRef;
   isEditingTitle: boolean;
   isEditingDescription: boolean;
+  isDraggable: boolean = true;
   update$: Subject<any> = new Subject();
   sub: Subscription;
 
@@ -51,11 +52,13 @@ export class StickerComponent implements OnInit, OnDestroy {
 
   editTitle() {
     this.isEditingTitle = true;
+    this.isDraggable = false;
     setTimeout(() => this.titleInput.nativeElement.focus());
   }
 
   editDescription() {
     this.isEditingDescription = true;
+    this.isDraggable = false;
     setTimeout(() => this.descriptionInput.nativeElement.focus());
   }
 

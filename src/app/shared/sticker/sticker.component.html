@@ -1,7 +1,7 @@
 <div
   class="app-sticker scale-transition lighten-2 z-depth-4"
   (onPositionChanged)="updateStickerPos($event)"
-  [draggable]>
+  [draggable]="isDraggable">
   <div class="app-sticker-heading" (dblclick)="editTitle()">
     <div class="app-sticker-heading-static" [hidden]="isEditingTitle">
       {{ data.title }}
